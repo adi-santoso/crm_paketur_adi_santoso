@@ -2,9 +2,13 @@
 
 namespace App\Repositories\Company;
 
+use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use LaravelEasyRepository\Repository;
 
 interface CompanyRepository extends Repository{
 
-    // Write something awesome :)
+    public function paginateList(Request $request): array;
+
+    public function getList(Request $request): Collection;
 }

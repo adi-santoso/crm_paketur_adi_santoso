@@ -6,6 +6,7 @@ return [
     'record_not_found' => ['rc' => '0404', 'message' => 'Record not found', 'data' => null],
     'incorrect_credential' => ['rc' => '0141', 'message' => 'The provided credentials are incorrect', 'data' => null],
     'url_not_reachable' => ['rc' => '0144', 'message' => 'URL not reachable', 'data' => null],
+    'invalid_data' => ['rc' => '0400', 'message' => 'The given data was invalid', 'data' => null],
     'unauthenticated' => ['rc' => '0401', 'message' => 'Unauthenticated', 'data' => null],
     'forbidden' => ['rc' => '0403', 'message' => 'You are not authorized to access this resource', 'data' => null],
     'method_not_allowed' => ['rc' => '0405', 'message' => 'Method not allowed', 'data' => null],

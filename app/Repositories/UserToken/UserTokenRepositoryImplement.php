@@ -18,6 +18,4 @@ class UserTokenRepositoryImplement extends Eloquent implements UserTokenReposito
     {
         $this->model = $model;
     }
-
-    // Write something awesome :)
 }

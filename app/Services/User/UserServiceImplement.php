@@ -3,6 +3,7 @@
 namespace App\Services\User;
 
 use Illuminate\Database\QueryException;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use LaravelEasyRepository\ServiceApi;
@@ -71,5 +72,38 @@ class UserServiceImplement extends ServiceApi implements UserService{
 
             throw $e;
         }
+    }
+
+    public function managerPaginateList(Request $request): array
+    {
+        $managers = $this->mainRepository->managerPaginateList($request);
+
+        if(!$managers['data'])
+            abort('404');
+
+        $response = [];
+        foreach ($managers['data'] as $manager){
+            $response['managers'][] = [
+                'id' => $manager['id'],
+                'name' => $manager['name'],
+                'email' => $manager['email'],
+            ];
+        }
+
+        $response['total'] = $managers['total'];
+        $response['links'] = [
+            'first' => $managers['first_page_url'],
+            'prev' => $managers['prev_page_url'],
+            'next' => $managers['next_page_url']
+        ];
+
+        return $response;
+    }
+
+    public function show(int $id): array
+    {
+        $manager =$this->mainRepository->findOrFail($id);
+
+        return ['manager' => $manager];
     }
 }

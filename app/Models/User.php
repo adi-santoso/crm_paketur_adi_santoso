@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -31,6 +32,20 @@ class User extends Authenticatable implements JWTSubject
         'updated_at',
         'deleted_at'
     ];
+
+    public function scopeFilterByIlikeName(Builder $query, ?string $name): void
+    {
+        $query->when($name, function ($query) use ($name) {
+            $query->orWhere('name', 'ILIKE', '%'.$name.'%');
+        });
+    }
+
+    public function scopeWithRole($query, $role)
+    {
+        return $query->whereHas('roles', function ($q) use ($role) {
+            $q->where('name', $role);
+        });
+    }
 
     public function getJWTIdentifier()
     {

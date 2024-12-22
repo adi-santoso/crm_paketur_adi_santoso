@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\ManagerController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -27,5 +28,13 @@ Route::middleware(['auth:api'])->group(function (){
         Route::post('/', [EmployeeController::class, 'store'])->name('employee.store');
         Route::put('/{id}', [EmployeeController::class, 'update'])->name('employee.update');
         Route::delete('/{id}', [EmployeeController::class, 'destroy'])->name('employee.destroy');
+    });
+
+    Route::prefix('managers')->group(function (){
+        Route::get('/', [ManagerController::class, 'index'])->name('managers.index');
+        Route::get('/{id}', [ManagerController::class, 'show'])->name('managers.show');
+        Route::post('/', [ManagerController::class, 'store'])->name('managers.store');
+        Route::put('/{id}', [ManagerController::class, 'update'])->name('managers.update');
+        Route::delete('/{id}', [ManagerController::class, 'destroy'])->name('managers.destroy');
     });
 });

@@ -10,7 +10,7 @@ class EmployeeUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255|unique:employees,name',
+            'name' => 'required|string|max:255|unique:employees,name,'. $this->route('id'),
             'phone' => 'required|string|unique:employees,phone,'. $this->route('id'),
             'address' => 'nullable|string'
         ];

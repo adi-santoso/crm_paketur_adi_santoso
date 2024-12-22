@@ -22,7 +22,7 @@ class CompanyController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-//        $this->authorize('CompanyController.read');
+        $this->authorize('CompanyController.read');
 
         $companies = $this->companyService->paginateList($request);
 
@@ -31,6 +31,8 @@ class CompanyController extends Controller
 
     public function store(CompanyStoreRequest $request)
     {
+        $this->authorize('CompanyController.create');
+
         $company = $this->companyService->create($request);
 
         return $this->createSuccess($company);
@@ -38,6 +40,8 @@ class CompanyController extends Controller
 
     public function show($id)
     {
+        $this->authorize('CompanyController.read');
+
         $company = $this->companyService->show($id);
 
         return $this->success($company);
@@ -45,6 +49,8 @@ class CompanyController extends Controller
 
     public function update(CompanyUpdateRequest $request, $id)
     {
+        $this->authorize('CompanyController.update');
+
         $company = $this->companyService->update($id, $request);
 
         return $this->success($company);
@@ -52,6 +58,8 @@ class CompanyController extends Controller
 
     public function destroy($id)
     {
+        $this->authorize('CompanyController.delete');
+
         $this->companyService->delete($id);
 
         return $this->success();

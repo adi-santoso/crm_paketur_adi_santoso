@@ -55,6 +55,15 @@ class PermissionSeeder extends Seeder
                 'name' => 'EmployeeController.delete',
                 'guard_name' => 'api'
             ],
+
+            [
+                'name' => 'ManagerController.read',
+                'guard_name' => 'api'
+            ],
+            [
+                'name' => 'ManagerController.update',
+                'guard_name' => 'api'
+            ],
         ];
 
 

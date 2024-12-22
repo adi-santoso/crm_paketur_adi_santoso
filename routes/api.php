@@ -10,10 +10,15 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('auth')->group(function () {
     Route::post('login', [AuthController::class, 'login'])->name('auth.login');
     Route::post('refresh', [AuthController::class, 'refresh'])->name('auth.refresh');
-    Route::post('logout', [AuthController::class, 'logout'])->name('auth.logout');
+
 });
 
 Route::middleware(['auth:api'])->group(function (){
+    Route::prefix('auth')->group(function () {
+        Route::post('logout', [AuthController::class, 'logout'])->name('auth.logout');
+    });
+
+
    Route::prefix('companies')->group(function (){
        Route::get('/', [CompanyController::class, 'index'])->name('company.index');
        Route::get('/{id}', [CompanyController::class, 'show'])->name('company.show');
@@ -33,8 +38,6 @@ Route::middleware(['auth:api'])->group(function (){
     Route::prefix('managers')->group(function (){
         Route::get('/', [ManagerController::class, 'index'])->name('managers.index');
         Route::get('/{id}', [ManagerController::class, 'show'])->name('managers.show');
-        Route::post('/', [ManagerController::class, 'store'])->name('managers.store');
         Route::put('/{id}', [ManagerController::class, 'update'])->name('managers.update');
-        Route::delete('/{id}', [ManagerController::class, 'destroy'])->name('managers.destroy');
     });
 });

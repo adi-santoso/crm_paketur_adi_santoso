@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\Employee\EmployeeService;
+use App\Http\Requests\ManagerUpdateRequest;
 use App\Services\User\UserService;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\JsonResponse;
@@ -21,29 +21,29 @@ class ManagerController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-//        $this->authorize('ManagerController.read');
+        $this->authorize('ManagerController.read');
 
         $managers = $this->userService->managerPaginateList($request);
 
         return $this->success($managers);
     }
 
-    public function store(Request $request)
-    {
-    }
 
     public function show($id)
     {
+        $this->authorize('ManagerController.read');
+
         $manager = $this->userService->show($id);
 
         return $this->success($manager);
     }
 
-    public function update(Request $request, $id)
+    public function update(ManagerUpdateRequest $request, $id)
     {
-    }
+        $this->authorize('ManagerController.update');
 
-    public function destroy($id)
-    {
+        $manager = $this->userService->updateManager($id, $request);
+
+        return $this->success($manager);
     }
 }

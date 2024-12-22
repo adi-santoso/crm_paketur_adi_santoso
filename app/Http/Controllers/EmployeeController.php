@@ -22,7 +22,7 @@ class EmployeeController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-//        $this->authorize('EmployeeController.read');
+        $this->authorize('EmployeeController.read');
 
         $employee = $this->employeeService->paginateList($request);
 
@@ -31,6 +31,7 @@ class EmployeeController extends Controller
 
     public function store(EmployeeStoreRequest $request)
     {
+        $this->authorize('EmployeeController.create');
         $employee = $this->employeeService->create($request);
 
         return $this->createSuccess($employee);
@@ -38,6 +39,7 @@ class EmployeeController extends Controller
 
     public function show($id)
     {
+        $this->authorize('EmployeeController.read');
         $employee = $this->employeeService->show($id);
 
         return $this->success($employee);
@@ -45,6 +47,7 @@ class EmployeeController extends Controller
 
     public function update(EmployeeUpdateRequest $request, $id)
     {
+        $this->authorize('EmployeeController.update');
         $employee = $this->employeeService->update($id, $request);
 
         return $this->success($employee);
@@ -52,6 +55,7 @@ class EmployeeController extends Controller
 
     public function destroy($id)
     {
+        $this->authorize('EmployeeController.delete');
         $this->employeeService->delete($id);
 
         return $this->success();

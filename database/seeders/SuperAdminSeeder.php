@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
 
 class SuperAdminSeeder extends Seeder
 {
@@ -28,9 +27,5 @@ class SuperAdminSeeder extends Seeder
 
         // Assign role Super Admin ke user
         $user->assignRole($superAdminRole);
-
-
-        Permission::firstOrCreate(['name' => 'manage everything']);
-        $superAdminRole->givePermissionTo('manage everything');
     }
 }

@@ -8,13 +8,14 @@ use App\Repositories\User\UserRepository;
 use App\Repositories\UserToken\UserTokenRepository;
 use App\Traits\AuthServiceTrait;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use LaravelEasyRepository\ServiceApi;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Exceptions\TokenBlacklistedException;
 use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 use Tymon\JWTAuth\Exceptions\TokenInvalidException;
-use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthServiceImplement extends ServiceApi implements AuthService{
 
@@ -48,7 +49,6 @@ class AuthServiceImplement extends ServiceApi implements AuthService{
       $this->userTokenRepository = $userTokenRepository;
     }
 
-    // Define your custom methods :)
 
     /**
      * @throws Exception
@@ -104,6 +104,51 @@ class AuthServiceImplement extends ServiceApi implements AuthService{
 
     public function logout(): array
     {
-        // TODO: Implement logout() method.
+        $payload = [];
+        $oldToken = request()->bearerToken();
+
+        try {
+            $payload = auth()->payload()->toArray();
+            auth()->logout();
+
+            try {
+                DB::beginTransaction();
+
+                $this->userTokenRepository->deleteByAccessToken($oldToken);
+
+                DB::commit();
+            } catch (QueryException $e) {
+                DB::rollBack();
+
+                Log::error($e->getTraceAsString());
+            }
+
+            return $payload;
+        } catch (TokenBlacklistedException|TokenExpiredException $e) {
+            Log::info($e->getTraceAsString());
+
+            try {
+                DB::beginTransaction();
+
+                $checkToken = $this->userTokenRepository->firstByAccessToken($oldToken);
+
+                if (! $checkToken)
+                    return $payload;
+
+                $this->userTokenRepository->deleteByAccessToken($oldToken);
+
+                DB::commit();
+            } catch (QueryException $e) {
+                DB::rollBack();
+
+                Log::error($e->getTraceAsString());
+            }
+
+            return $payload;
+        } catch (JWTException|TokenInvalidException $e) {
+            Log::info($e->getTraceAsString());
+
+            return $payload;
+        }
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Services\User;
 
+use App\Http\Requests\ManagerUpdateRequest;
 use Illuminate\Http\Request;
 use LaravelEasyRepository\BaseService;
 
@@ -15,4 +16,5 @@ interface UserService extends BaseService{
 
     public function show(int $id):array;
 
+    public function updateManager($id, ManagerUpdateRequest|array $data):array;
 }

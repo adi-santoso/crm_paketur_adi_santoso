@@ -2,12 +2,14 @@
 
 namespace App\Services\User;
 
+use App\Http\Requests\ManagerUpdateRequest;
+use App\Repositories\User\UserRepository;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use LaravelEasyRepository\ServiceApi;
-use App\Repositories\User\UserRepository;
 
 class UserServiceImplement extends ServiceApi implements UserService{
 
@@ -105,5 +107,29 @@ class UserServiceImplement extends ServiceApi implements UserService{
         $manager =$this->mainRepository->findOrFail($id);
 
         return ['manager' => $manager];
+    }
+
+    public function updateManager($id, array|ManagerUpdateRequest $data): array
+    {
+        try{
+            DB::beginTransaction();
+
+            if($id!=Auth::id())
+                abort(403);
+
+            $user = $this->mainRepository->findOrFail($id);
+
+            $this->mainRepository->update($id, $data->validated());
+
+            DB::commit();
+
+            return ['company' => $user->refresh()->toArray()];
+        } catch (QueryException $e){
+            DB::rollBack();
+
+            Log::error($e->getTraceAsString());
+
+            throw $e;
+        }
     }
 }

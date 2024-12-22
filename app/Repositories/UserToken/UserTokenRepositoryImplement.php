@@ -2,6 +2,7 @@
 
 namespace App\Repositories\UserToken;
 
+use Illuminate\Support\Collection;
 use LaravelEasyRepository\Implementations\Eloquent;
 use App\Models\UserToken;
 
@@ -17,5 +18,25 @@ class UserTokenRepositoryImplement extends Eloquent implements UserTokenReposito
     public function __construct(UserToken $model)
     {
         $this->model = $model;
+    }
+
+    public function deleteByAccessToken(?string $accessToken): void
+    {
+        $this->model->where('access_token', $accessToken)->delete();
+    }
+
+    public function firstByAccessToken(?string $accessToken): ?UserToken
+    {
+        return $this->model->where('access_token', $accessToken)->first();
+    }
+
+    public function getAccessTokenByUserIds(array $userIds): Collection
+    {
+        return $this->model->whereIn('user_id', $userIds)->get();
+    }
+
+    public function deleteByUserIds(array $userIds): void
+    {
+        $this->model->whereIn('user_id', $userIds)->delete();
     }
 }

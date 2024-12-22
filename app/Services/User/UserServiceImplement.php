@@ -2,6 +2,9 @@
 
 namespace App\Services\User;
 
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use LaravelEasyRepository\ServiceApi;
 use App\Repositories\User\UserRepository;
 
@@ -30,5 +33,43 @@ class UserServiceImplement extends ServiceApi implements UserService{
       $this->mainRepository = $mainRepository;
     }
 
-    // Define your custom methods :)
+    public function create(mixed $data): array
+    {
+        try {
+            DB::beginTransaction();
+
+            $user = $this->mainRepository->create($data);
+
+            DB::commit();
+
+            return ['user' => $user->fresh()->toArray()];
+        } catch (QueryException $e){
+            DB::rollBack();
+
+            Log::error($e->getTraceAsString());
+
+            throw $e;
+        }
+    }
+
+    public function createManager(mixed $data): array
+    {
+        try {
+            DB::beginTransaction();
+
+            $user = $this->mainRepository->create($data);
+
+            $user->assignRole('manager');
+
+            DB::commit();
+
+            return ['manager' => $user->fresh()->toArray()];
+        } catch (QueryException $e){
+            DB::rollBack();
+
+            Log::error($e->getTraceAsString());
+
+            throw $e;
+        }
+    }
 }

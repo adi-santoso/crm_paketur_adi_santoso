@@ -19,5 +19,4 @@ class UserRepositoryImplement extends Eloquent implements UserRepository{
         $this->model = $model;
     }
 
-    // Write something awesome :)
 }

@@ -1,18 +1,17 @@
 <?php
 
-namespace App\Services\Company;
+namespace App\Services\Employee;
 
 use App\Http\Requests\CompanyUpdateRequest;
-use App\Repositories\User\UserRepository;
+use App\Http\Requests\EmployeeUpdateRequest;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Validation\ValidationException;
 use LaravelEasyRepository\ServiceApi;
-use App\Repositories\Company\CompanyRepository;
+use App\Repositories\Employee\EmployeeRepository;
 
-class CompanyServiceImplement extends ServiceApi implements CompanyService{
+class EmployeeServiceImplement extends ServiceApi implements EmployeeService{
 
     /**
      * set title message api for CRUD
@@ -30,40 +29,36 @@ class CompanyServiceImplement extends ServiceApi implements CompanyService{
      * don't change $this->mainRepository variable name
      * because used in extends service class
      */
-     protected CompanyRepository $mainRepository;
-     protected UserRepository $userRepository;
+     protected EmployeeRepository $mainRepository;
 
-    public function __construct(
-        CompanyRepository $mainRepository,
-        UserRepository $userRepository,
-    )
+    public function __construct(EmployeeRepository $mainRepository)
     {
       $this->mainRepository = $mainRepository;
-      $this->userRepository = $userRepository;
     }
 
+    // Define your custom methods :)
     public function paginateList(Request $request): array
     {
-        $companies = $this->mainRepository->paginateList($request);
+        $employees = $this->mainRepository->paginateList($request);
 
-        if(!$companies['data'])
+        if(!$employees['data'])
             abort('404');
 
         $response = [];
-        foreach ($companies['data'] as $company){
-            $response['companies'][] = [
-              'id' => $company['id'],
-              'name' => $company['name'],
-              'email' => $company['email'],
-              'phone' => $company['phone'],
+        foreach ($employees['data'] as $employee){
+            $response['employees'][] = [
+                'id' => $employee['id'],
+                'name' => $employee['name'],
+                'phone' => $employee['phone'],
+                'address' => $employee['address'],
             ];
         }
 
-        $response['total'] = $companies['total'];
+        $response['total'] = $employees['total'];
         $response['links'] = [
-            'first' => $companies['first_page_url'],
-            'prev' => $companies['prev_page_url'],
-            'next' => $companies['next_page_url']
+            'first' => $employees['first_page_url'],
+            'prev' => $employees['prev_page_url'],
+            'next' => $employees['next_page_url']
         ];
 
         return $response;
@@ -71,8 +66,9 @@ class CompanyServiceImplement extends ServiceApi implements CompanyService{
 
     public function show(int $id): array
     {
-        $company =$this->mainRepository->findOrFail($id);
-        return ['company' => $company];
+        $employee =$this->mainRepository->findById($id);
+
+        return ['employee' => $employee];
     }
 
     public function create(mixed $data): array
@@ -80,24 +76,12 @@ class CompanyServiceImplement extends ServiceApi implements CompanyService{
         try{
             DB::beginTransaction();
 
-            $company = $this->mainRepository->create($data->validated());
-
-            $manager = $this->userRepository->create(
-                [
-                    'name' => 'Manager ' . $company->name,
-                    'email' => 'manager_' . $company->id . '@example.com',
-                    'password' => bcrypt('password'),
-                    'company_id' => $company->id,
-                ]
-            );
-
-            $manager->assignRole('manager');
+            $employee = $this->mainRepository->create($data->validated());
 
             DB::commit();
 
             return [
-                'company' => $company->fresh()->toArray(),
-                'manager' => $manager
+                'employee' => $employee->fresh()->toArray()
             ];
         } catch (QueryException $e){
             DB::rollBack();
@@ -108,18 +92,18 @@ class CompanyServiceImplement extends ServiceApi implements CompanyService{
         }
     }
 
-    public function update($id, CompanyUpdateRequest|array $data):array{
+    public function update($id, EmployeeUpdateRequest|array $data):array{
 
         try{
             DB::beginTransaction();
 
-            $company = $this->mainRepository->findOrFail($id);
+            $employee = $this->mainRepository->findOrFail($id);
 
             $this->mainRepository->update($id, $data->validated());
 
             DB::commit();
 
-            return ['company' => $company->refresh()->toArray()];
+            return ['employee' => $employee->refresh()->toArray()];
         } catch (QueryException $e){
             DB::rollBack();
 

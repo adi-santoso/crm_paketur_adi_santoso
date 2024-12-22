@@ -7,7 +7,13 @@ use App\Http\Requests\LoginRequest;
 use App\Repositories\User\UserRepository;
 use App\Repositories\UserToken\UserTokenRepository;
 use App\Traits\AuthServiceTrait;
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Support\Facades\Log;
 use LaravelEasyRepository\ServiceApi;
+use Tymon\JWTAuth\Exceptions\JWTException;
+use Tymon\JWTAuth\Exceptions\TokenBlacklistedException;
+use Tymon\JWTAuth\Exceptions\TokenExpiredException;
+use Tymon\JWTAuth\Exceptions\TokenInvalidException;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthServiceImplement extends ServiceApi implements AuthService{
@@ -75,7 +81,25 @@ class AuthServiceImplement extends ServiceApi implements AuthService{
 
     public function refresh(): array
     {
-        // TODO: Implement refresh() method.
+        $oldToken = request()->bearerToken();
+
+        try {
+            $refresh = auth()->refresh();
+            $ttl = auth()->factory()->getTTL() * 60;
+            $user = auth()->setToken($refresh)->user();
+
+            $this->createAndDeleteUserToken($user->id, $refresh, $oldToken);
+
+            return [
+                'access_token' => $refresh,
+                'token_type' => 'Bearer',
+                'expires_in' => $ttl
+            ];
+        } catch (TokenBlacklistedException|TokenExpiredException|TokenInvalidException|JWTException $e) {
+            Log::info($e->getTraceAsString());
+
+            throw new AuthenticationException();
+        }
     }
 
     public function logout(): array

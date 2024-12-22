@@ -46,7 +46,8 @@ return Application::configure(basePath: dirname(__DIR__))
         });
 
         $exceptions->renderable(function (QueryException $e, $request) {
-            return response()->json(config('rc.internal_server_error'), 500);
+//            return response()->json(config('rc.internal_server_error'), 500);
+            return response()->json($e->getMessage(), 500);
         });
 
         $exceptions->renderable(function (NotFoundHttpException $e, $request) {

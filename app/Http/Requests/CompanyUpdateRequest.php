@@ -11,7 +11,7 @@ class CompanyUpdateRequest extends FormRequest
         return [
             'name' => 'required|string|max:255|unique:companies,name',
             'email' => 'required|string|email',
-            'phone' => 'nullable|string'
+            'phone' => 'nullable|string|unique:companies,phone'
         ];
     }
 

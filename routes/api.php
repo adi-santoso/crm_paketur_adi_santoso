@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\EmployeeController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -19,4 +20,12 @@ Route::middleware(['auth:api'])->group(function (){
        Route::put('/{id}', [CompanyController::class, 'update'])->name('company.update');
        Route::delete('/{id}', [CompanyController::class, 'destroy'])->name('company.destroy');
    });
+
+    Route::prefix('employees')->group(function (){
+        Route::get('/', [EmployeeController::class, 'index'])->name('employee.index');
+        Route::get('/{id}', [EmployeeController::class, 'show'])->name('employee.show');
+        Route::post('/', [EmployeeController::class, 'store'])->name('employee.store');
+        Route::put('/{id}', [EmployeeController::class, 'update'])->name('employee.update');
+        Route::delete('/{id}', [EmployeeController::class, 'destroy'])->name('employee.destroy');
+    });
 });

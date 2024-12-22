@@ -10,8 +10,8 @@ class CompanyStoreRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255|unique:companies,name',
-            'email' => 'required|string|email',
-            'phone' => 'nullable|string'
+            'email' => 'required|email|unique:companies,email',
+            'phone' => 'nullable|string|unique:companies,phone'
         ];
     }
 

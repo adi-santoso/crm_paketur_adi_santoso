@@ -11,7 +11,6 @@ class ManagerUpdateRequest extends FormRequest
         return [
             'name' => 'required|string|max:255|unique:users,name,'. $this->route('id'),
             'email' => 'required|string|email|unique:users,email,'.$this->route('id'),
-            'address' => 'nullable|string'
         ];
     }
 
